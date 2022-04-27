@@ -30,7 +30,7 @@ std::string study{};
 double number = 1.23;
 bool boolean = true;
 argz::options opts{
-   { { "input", 'i' }, input, "the input file", argz::required,
+   { { "input", 'i' }, input, "the input file", argz::required},
    { { "study", 's' }, study, "a study file"},
    { { "number" }, number, "input a double"},
    { { "boolean" }, boolean, "a boolean" }    
