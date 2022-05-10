@@ -18,6 +18,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <variant>
+#include <vector>
 
 namespace argz
 {
@@ -79,10 +80,19 @@ namespace argz
                x.get() = str;
             }
             else if constexpr (std::is_arithmetic_v<T> && !std::is_same_v<T, bool>) {
+#ifdef __cpp_lib_to_chars
                auto [p, ec] = std::from_chars(str.data(), str.data() + str.size(), x);
                if (ec != std::errc()) {
                   throw std::runtime_error("Invalid number parse for: " + std::string(str));
                }
+#else
+               if constexpr (std::is_integral_v<T>) {
+                  x.get() = static_cast<T>(std::stol(std::string(str)));
+               }
+               else {
+                  x.get() = static_cast<T>(std::stod(std::string(str)));
+               }
+#endif
             }
             else if constexpr (std::is_same_v<T, bool>) {
                if (str == "true") {
@@ -203,7 +213,7 @@ namespace argz
          }
       }
 
-      for (auto i = 1; i < argc; ++i) {
+      for (int_t i = 1; i < argc; ++i) {
          const char* flag = argv[i];
          if (*flag != '-') {
             throw std::runtime_error("expected '-'");
