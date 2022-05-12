@@ -164,5 +164,27 @@ int main(int argc, char* argv[])
        expect(eq(boolean, true)); 
    };
 
+
+
+   test("test5") = [&] {
+       expect(nothrow([&] {parse_string(R"(program.exe -h)"); }));
+
+   };
+
+   test("test6") = [&] {
+     
+       expect(nothrow([&] {parse_string(R"(program.exe -i some/path -study s --boolean   --        )"); }));
+       expect(eq(input, std::string("some/path")));
+       expect(eq(study, std::string("s")));
+       expect(eq(boolean, true));
+
+   };
+
+   test("test7") = [&] {
+       
+       expect(throws([&] {parse_string(R"(program.exe -i some/path -study s --boolean  2.7 --number true)"); }));
+   };
+
+
    return 0;
 }
