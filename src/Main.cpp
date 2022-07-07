@@ -28,7 +28,6 @@ inline std::vector<std::string> string_to_vector(const std::string& str)
                throw std::runtime_error("unepected '-'");
             }
             else if (*c==' ') {
-                //throw std::runtime_error("missing arguments");
                 break;
             }
            
@@ -183,6 +182,11 @@ int main(int argc, char* argv[])
    test("test7") = [&] {
        
        expect(throws([&] {parse_string(R"(program.exe -i some/path -study s --boolean  2.7 --number true)"); }));
+   };
+   
+   test("test-dashes") = [&] {
+       parse_string(R"(program.exe -i ./some-path-with-dashes.txt )");
+       expect(eq(input, std::string("./some-path-with-dashes.txt"))) << "actual: " << input;
    };
 
 
