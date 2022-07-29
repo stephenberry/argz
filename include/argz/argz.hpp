@@ -60,7 +60,7 @@ namespace argz
    {
       inline std::string_view parse_var(const char* c) {
          auto start = c;
-         while (*c != '\0' && *c != '-') {
+         while (*c != '\0' && *c != ' ') {
             ++c;
          }
          return { start, static_cast<size_t>(c - start) };
