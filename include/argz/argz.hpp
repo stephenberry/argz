@@ -160,10 +160,9 @@ namespace argz
             throw std::runtime_error("expected '-'");
          }
          ++flag;
-         const bool repated_flag = *flag == '-';
-
+         
          std::string_view str;
-         if (repated_flag) {
+         if (*flag == '-') {
             ++flag;
             str = detail::parse_var(flag);
          }
