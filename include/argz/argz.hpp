@@ -175,12 +175,11 @@ namespace argz
          
          for (auto& x : opts) {
             if (x.ids.id == str) {
-               auto& v = x.value;
-               if (std::holds_alternative<ref<bool>>(v)) {
-                  std::get<ref<bool>>(v).get() = true;
+               if (std::holds_alternative<ref<bool>>(x.value)) {
+                  std::get<ref<bool>>(x.value).get() = true;
                }
                else {
-                  detail::parse(argv[++i], v);
+                  detail::parse(argv[++i], x.value);
                }
             }
          }
@@ -193,7 +192,6 @@ namespace argz
       for (auto& i : required_inputs) {
          if (!inputs.count(i)) {
             std::cerr << "Required '--" + std::string(i) + "' was not provided\n\n";
-            detail::help(about, opts);
          }
       }
    }
