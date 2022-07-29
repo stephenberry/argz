@@ -114,7 +114,7 @@ namespace argz
          return detail::help(about, opts);
       }
 
-      std::unordered_set<std::string_view> required_inputs, inputs;
+      std::unordered_set<std::string_view> req_inputs, inputs;
       
       auto get_id = [&](char alias) -> std::string_view {
          for (auto& x : opts) {
@@ -132,7 +132,7 @@ namespace argz
          }
 
          if (req) {
-            required_inputs.emplace(ids.id);
+            req_inputs.emplace(ids.id);
          }
       }
 
@@ -154,7 +154,11 @@ namespace argz
                detail::help(about, opts);
                continue;
             }
-            else if (str.size() == 1) {
+            if (str == "v" || str == "version") {
+               std::cout << "Version: " << about.version << '\n';
+               continue;
+            }
+            if (str.size() == 1) {
                str = get_id(*flag);
                
                if (str.empty()) {
@@ -162,9 +166,7 @@ namespace argz
                }
             }
          }
-         if (str.empty()) {
-            break;
-         }
+         if (str.empty()) { break; }
          inputs.emplace(str);
          
          for (auto& x : opts) {
@@ -179,13 +181,9 @@ namespace argz
          }
       }
 
-      if (inputs.count("version")) {
-         std::cout << "Version: " << about.version << '\n';
-      }
-
-      for (auto& i : required_inputs) {
+      for (auto& i : req_inputs) {
          if (!inputs.count(i)) {
-            std::cerr << "Required '--" + std::string(i) + "' was not provided\n\n";
+            std::cerr << "Required '--" << i << "' was not provided\n\n";
          }
       }
    }

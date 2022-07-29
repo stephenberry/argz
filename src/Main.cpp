@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
       { { "input", 'i' }, input, "the input file", argz::required},
       { { "study", 's' }, study, "a study file"},
       { { "number" }, number, "input an int"},
-      { { "boolean" }, boolean, "a boolean" }    
+      { { "boolean" }, boolean, "a boolean" },
    };
 
    try {
