@@ -27,7 +27,7 @@ namespace argz
    using var = std::variant<ref<bool>,
       ref<int32_t>, ref<uint32_t>, ref<int64_t>, ref<uint64_t>,
    ref<std::string>>;
-
+   
    struct ids_t final {
       std::string_view id{};
       char alias = '\0';
@@ -76,37 +76,34 @@ namespace argz
          }, v);
       }
    }
-
-   namespace detail
+   
+   inline void help(const about& about, const options& opts)
    {
-      inline void help(const about& about, const options& opts)
-      {
-         std::cout << about.description << '\n';
-         std::cout << "Version: " << about.version << '\n';
-         
-         std::cout << '\n' << R"(-h, --help       write help to console)" << '\n';
-         std::cout << R"(-v, --version    write the version to console)" << '\n';
+      std::cout << about.description << '\n';
+      std::cout << "Version: " << about.version << '\n';
+      
+      std::cout << '\n' << R"(-h, --help       write help to console)" << '\n';
+      std::cout << R"(-v, --version    write the version to console)" << '\n';
 
-         for (auto& [ids, v, h] : opts)
-         {
-            if (ids.alias != '\0') {
-               std::cout << '-' << ids.alias << ", --" << ids.id;
-            }
-            else {
-               std::cout << (ids.id.size() == 1 ? "-" : "--") << ids.id;
-            }
-            std::cout << "    " << h;
-            std::cout << ", default: " << detail::to_string(v) << '\n';
+      for (auto& [ids, v, h] : opts)
+      {
+         if (ids.alias != '\0') {
+            std::cout << '-' << ids.alias << ", --" << ids.id;
          }
-         std::cout << '\n';
+         else {
+            std::cout << (ids.id.size() == 1 ? "-" : "--") << ids.id;
+         }
+         std::cout << "    " << h;
+         std::cout << ", default: " << detail::to_string(v) << '\n';
       }
+      std::cout << '\n';
    }
 
    template <class int_t, class char_ptr_t, std::enable_if_t<std::is_pointer_v<char_ptr_t>, int> = 0>
    inline void parse(about& about, options& opts, const int_t argc, char_ptr_t argv)
    {
       if (argc == 1) {
-         return detail::help(about, opts);
+         return help(about, opts);
       }
       
       auto get_id = [&](char alias) -> std::string_view {
@@ -131,7 +128,7 @@ namespace argz
          }
          str = detail::parse_var(flag);
          if (str == "h" || str == "help") {
-            detail::help(about, opts);
+            help(about, opts);
             continue;
          }
          if (str == "v" || str == "version") {
