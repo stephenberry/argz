@@ -71,8 +71,8 @@ namespace argz
 
       inline std::string to_string(const var& v) {
          return std::visit(overloaded {
-            [&](const ref<std::string>& x) { return x.get(); },
-            [&](const auto& x) { return std::to_string(x.get()); },
+            [](const ref<std::string>& x) { return x.get(); },
+            [](const auto& x) { return std::to_string(x.get()); },
          }, v);
       }
    }
@@ -95,7 +95,6 @@ namespace argz
             else {
                std::cout << (ids.id.size() == 1 ? "-" : "--") << ids.id;
             }
-            
             std::cout << "    " << h;
             std::cout << ", default: " << detail::to_string(v) << '\n';
          }
