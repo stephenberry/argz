@@ -158,7 +158,6 @@ namespace argz
          }
          if (str.size() == 1) {
             str = get_id(*flag);
-            
             if (str.empty()) {
                throw std::runtime_error("Invalid alias flag '-' for: " + std::string(str));
             }
