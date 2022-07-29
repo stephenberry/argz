@@ -24,9 +24,7 @@ namespace argz
    template <class T>
    using ref = std::reference_wrapper<T>;
 
-   using var = std::variant<ref<bool>,
-      ref<int32_t>, ref<uint32_t>, ref<int64_t>, ref<uint64_t>,
-   ref<std::string>>;
+   using var = std::variant<ref<bool>, ref<int32_t>, ref<int64_t>, ref<uint64_t>, ref<std::string>>;
    
    struct ids_t final {
       std::string_view id{};
@@ -93,8 +91,7 @@ namespace argz
          else {
             std::cout << (ids.id.size() == 1 ? "-" : "--") << ids.id;
          }
-         std::cout << "    " << h;
-         std::cout << ", default: " << detail::to_string(v) << '\n';
+         std::cout << "    " << h << ", default: " << detail::to_string(v) << '\n';
       }
       std::cout << '\n';
    }
