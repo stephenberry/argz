@@ -16,7 +16,6 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
-#include <unordered_set>
 #include <variant>
 #include <vector>
 
@@ -38,12 +37,9 @@ namespace argz
       ids_t ids{};
       var value;
       std::string_view help{};
-      bool required{};
    };
 
    using options = std::vector<arg_t>;
-
-   inline constexpr bool required = true;
 
    struct about final {
       std::string_view description{}, version{};
@@ -91,7 +87,7 @@ namespace argz
          std::cout << '\n' << R"(-h, --help       write help to console)" << '\n';
          std::cout << R"(-v, --version    write the version to console)" << '\n';
 
-         for (auto& [ids, value, help, req] : opts)
+         for (auto& [ids, v, h] : opts)
          {
             if (ids.alias != '\0') {
                std::cout << '-' << ids.alias << ", --" << ids.id;
@@ -100,8 +96,8 @@ namespace argz
                std::cout << (ids.id.size() == 1 ? "-" : "--") << ids.id;
             }
             
-            std::cout << (req ? " (required)  " : "    ") << help;
-            std::cout << ", default: " << detail::to_string(value) << '\n';
+            std::cout << "    " << h;
+            std::cout << ", default: " << detail::to_string(v) << '\n';
          }
          std::cout << '\n';
       }
@@ -113,8 +109,6 @@ namespace argz
       if (argc == 1) {
          return detail::help(about, opts);
       }
-
-      std::unordered_set<std::string_view> req_inputs, inputs;
       
       auto get_id = [&](char alias) -> std::string_view {
          for (auto& x : opts) {
@@ -125,14 +119,10 @@ namespace argz
          return {};
       };
 
-      for (auto& [ids, v, h, r] : opts)
+      for (auto& [ids, v, h] : opts)
       {
          if (ids.id.empty() && ids.alias == '\0') {
             throw std::runtime_error("Empty identifier given");
-         }
-
-         if (r) {
-            req_inputs.emplace(ids.id);
          }
       }
 
@@ -163,9 +153,8 @@ namespace argz
             }
          }
          if (str.empty()) { break; }
-         inputs.emplace(str);
          
-         for (auto& [ids, v, h, r] : opts) {
+         for (auto& [ids, v, h] : opts) {
             if (ids.id == str) {
                if (std::holds_alternative<ref<bool>>(v)) {
                   std::get<ref<bool>>(v).get() = true;
@@ -174,12 +163,6 @@ namespace argz
                   detail::parse(argv[++i], v);
                }
             }
-         }
-      }
-
-      for (auto& i : req_inputs) {
-         if (!inputs.count(i)) {
-            std::cerr << "Required '--" << i << "' was not provided\n\n";
          }
       }
    }

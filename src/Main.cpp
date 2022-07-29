@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
    bool boolean = true;
 
    argz::options opts{
-      { { "input", 'i' }, input, "the input file", argz::required},
+      { { "input", 'i' }, input, "the input file"},
       { { "study", 's' }, study, "a study file"},
       { { "number" }, number, "input an int"},
       { { "boolean" }, boolean, "a boolean" },
@@ -173,6 +173,10 @@ int main(int argc, char* argv[])
 
    test("test7") = [&] {
        expect(throws([&] {parse_string(R"(program.exe -i some/path --study s --boolean  27 --number true)"); }));
+   };
+   
+   test("test8") = [&] {
+       expect(nothrow([&] {parse_string(R"(program.exe - )"); }));
    };
    
    test("test-dashes") = [&] {
