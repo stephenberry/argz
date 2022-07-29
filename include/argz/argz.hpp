@@ -128,20 +128,11 @@ namespace argz
                }
                std::cout << ids.id;
             }
-
-            if (req) {
-               std::cout << " (required)\t";
-            }
-            else {
-               std::cout << "\t\t";
-            }
+            
+            std::cout << (req ? " (required)\t" : "\t\t");
 
             std::cout << help;
-            const auto d = detail::to_string(value);
-            if (d.size()) {
-               std::cout << ", default: " << d;
-            }
-            std::cout << '\n';
+            std::cout << ", default: " << detail::to_string(value) << '\n';
          }
          std::cout << '\n';
       }
