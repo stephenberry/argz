@@ -95,10 +95,9 @@ namespace argz
          if (about.version.size()) {
             std::cout << "Version: " << about.version << '\n';
          }
-         std::cout << '\n';
-
-         std::cout << "-h, --help\t\twrite help to console\n";
-         std::cout << "-v, --version\t\twrite the version to console\n";
+         
+         std::cout << '\n' << R"(-h, --help       write help to console)" << '\n';
+         std::cout << R"(-v, --version    write the version to console)" << '\n';
 
          for (auto& [ids, value, help, req] : opts)
          {
@@ -107,17 +106,10 @@ namespace argz
                std::cout << ", " << "--" << ids.id;
             }
             else {
-               if (ids.id.size() == 1) {
-                  std::cout << '-';
-               }
-               else {        
-                  std::cout << "--";
-               }
-               std::cout << ids.id;
+               std::cout << (ids.id.size() == 1 ? "-" : "--") << ids.id;
             }
             
-            std::cout << (req ? " (required)\t" : "\t\t");
-
+            std::cout << (req ? " (required)  " : "    ");
             std::cout << help;
             std::cout << ", default: " << detail::to_string(value) << '\n';
          }
