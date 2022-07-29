@@ -227,6 +227,9 @@ namespace argz
                throw std::runtime_error("Invalid alias flag '-' for: " + std::string(str));
             }
          }
+         if (str.empty()) {
+            break;
+         }
          inputs.emplace(str);
               
          auto& v = values.at(str);
