@@ -12,7 +12,6 @@
 
 #pragma once
 
-#include <charconv>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -75,14 +74,7 @@ namespace argz
                x.get() = str;
             }
             else if constexpr (std::is_integral_v<T> && !std::is_same_v<T, bool>) {
-#ifdef __cpp_lib_to_chars
-               auto [p, ec] = std::from_chars(str.data(), str.data() + str.size(), x);
-               if (ec != std::errc()) {
-                  throw std::runtime_error("Invalid number parse for: " + std::string(str));
-               }
-#else
                x.get() = static_cast<T>(std::stol(std::string(str)));
-#endif
             }
             else if constexpr (std::is_same_v<T, bool>) {
                x.get() = str == "true" ? true : false;
