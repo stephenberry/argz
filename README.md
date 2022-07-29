@@ -18,11 +18,11 @@ Simply include `argz.hpp` and you're good to go.
 Start with an about:  `argz::about`
 
 ```cpp
- constexpr std::string_view version = "1.2.3";
-   argz::about about{ "My program description", version };
+constexpr std::string_view version = "1.2.3";
+argz::about about{ "My program description", version };
 ```
 
-To add a new argument, simply create ```argz::options```. Provide a list of argument names that you want to group together, e.g. ```-i``` and ```--input```. An argument can be required by adding ```argz::required``` to the argument when initialized.
+To add a new argument, simply create ```argz::options```. Provide a list of argument names that you want to group together, e.g. ```-i``` and ```--input```.
 
 ```cpp
 std::string input{};
@@ -30,7 +30,7 @@ std::string study{};
 int number = 123;
 bool boolean = true;
 argz::options opts{
-   { { "input", 'i' }, input, "the input file", argz::required},
+   { { "input", 'i' }, input, "the input file"},
    { { "study", 's' }, study, "a study file"},
    { { "number" }, number, "input a double"},
    { { "boolean" }, boolean, "a boolean" }    
@@ -62,7 +62,7 @@ Version: 1.2.3
 
 -h, --help              write help to console
 -v, --version           write the version to console
--i, --input (required)  the input file
+-i, --input						  the input file
 -s, --study             a study file
 --number                input an int, default: 123
 --boolean               a boolean, default: 1
