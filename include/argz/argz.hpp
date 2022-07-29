@@ -88,12 +88,8 @@ namespace argz
    {
       inline void help(const about& about, const options& opts)
       {
-         if (about.description.size()) {
-            std::cout << about.description << '\n';
-         }
-         if (about.version.size()) {
-            std::cout << "Version: " << about.version << '\n';
-         }
+         std::cout << about.description << '\n';
+         std::cout << "Version: " << about.version << '\n';
          
          std::cout << '\n' << R"(-h, --help       write help to console)" << '\n';
          std::cout << R"(-v, --version    write the version to console)" << '\n';
@@ -101,8 +97,7 @@ namespace argz
          for (auto& [ids, value, help, req] : opts)
          {
             if (ids.alias != '\0') {
-               std::cout << '-' << ids.alias;
-               std::cout << ", " << "--" << ids.id;
+               std::cout << '-' << ids.alias << ", --" << ids.id;
             }
             else {
                std::cout << (ids.id.size() == 1 ? "-" : "--") << ids.id;
