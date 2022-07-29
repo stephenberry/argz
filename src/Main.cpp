@@ -50,7 +50,7 @@ inline std::vector<std::string> string_to_vector(const std::string& str)
             ++c;
          }
          auto start = c;
-         while (*c != '\0' && *c != '-' && *c != ' ' && *c != '"') {
+         while (*c != '\0' && *c != ' ' && *c != '"') {
             ++c;
          }
          if (c != start) {
@@ -61,7 +61,7 @@ inline std::vector<std::string> string_to_vector(const std::string& str)
       else {
          auto start = c;
          while (*c != ' ' && *c != '\0') {
-            ++c   ;
+            ++c;
          }
 
          ret.emplace_back(std::string(std::string_view{ start, static_cast<size_t>(c - start) }));
@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
    };
 
    test("test0") = [&] {
-      parse_string(R"(program.exe -i some_file -study study_file --boolean --number 1.2345)");
+      parse_string(R"(program.exe -i some_file --study study_file --boolean --number 1.2345)");
 
       expect(eq(input, std::string("some_file")));
       expect(eq(study, std::string("study_file")));
@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
    };
 
    test("test1") = [&] {
-      parse_string(R"(program.exe -i some/path -study s --boolean --number 1.2)");
+      parse_string(R"(program.exe -i some/path --study s --boolean --number 1.2)");
 
       expect(eq(input, std::string("some/path")));
       expect(eq(study, std::string("s")));
@@ -144,26 +144,20 @@ int main(int argc, char* argv[])
    };
 
    test("test3") = [&] {
-
-
-       parse_string(R"(program.exe -i "some/path" -study "s" --boolean --number 2.2 )");
+       parse_string(R"(program.exe -i "some/path" --study "s" --boolean --number 2.2 )");
        expect(eq(input, std::string("some/path")));
        expect(eq(study, std::string("s")));
        expect(eq(number, 2.2));
        expect(eq(boolean, true));
    };
 
-
-
    test("test4") = [&] {
-       parse_string(R"(program.exe -i                                 some/path -study s --boolean -- )");
+       parse_string(R"(program.exe -i                                 some/path --study s --boolean -- )");
        expect(eq(input, std::string("some/path")));
        expect(eq(study, std::string("s")));
        expect(eq(number, 2.2));
        expect(eq(boolean, true)); 
    };
-
-
 
    test("test5") = [&] {
        expect(nothrow([&] {parse_string(R"(program.exe -h)"); }));
@@ -172,7 +166,7 @@ int main(int argc, char* argv[])
 
    test("test6") = [&] {
      
-       expect(nothrow([&] {parse_string(R"(program.exe -i some/path -study s --boolean   --        )"); }));
+       expect(nothrow([&] {parse_string(R"(program.exe -i some/path --study s --boolean   --        )"); }));
        expect(eq(input, std::string("some/path")));
        expect(eq(study, std::string("s")));
        expect(eq(boolean, true));
@@ -181,14 +175,13 @@ int main(int argc, char* argv[])
 
    test("test7") = [&] {
        
-       expect(throws([&] {parse_string(R"(program.exe -i some/path -study s --boolean  2.7 --number true)"); }));
+       expect(throws([&] {parse_string(R"(program.exe -i some/path --study s --boolean  2.7 --number true)"); }));
    };
    
    test("test-dashes") = [&] {
        parse_string(R"(program.exe -i ./some-path-with-dashes.txt )");
        expect(eq(input, std::string("./some-path-with-dashes.txt"))) << "actual: " << input;
    };
-
 
    return 0;
 }

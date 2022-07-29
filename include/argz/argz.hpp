@@ -30,17 +30,14 @@ namespace argz
    using var_t = std::variant<ref_t<bool>,
       ref_t<int>, ref_t<std::size_t>,
       ref_t<float>, ref_t<double>,
-      ref_t<std::string>,
-      ref_t<std::string_view>>;
+      ref_t<std::string>>;
 
-   struct ids_t final
-   {
+   struct ids_t final {
       std::string_view id{};
       char alias = '\0';
    };   
 
-   struct arg_t final
-   {
+   struct arg_t final {
       ids_t ids{};
       var_t value;
       std::string_view help{};
@@ -51,8 +48,7 @@ namespace argz
 
    inline constexpr bool required = true;
 
-   struct about final
-   {
+   struct about final {
       std::string_view description{}, version{};
       bool help{};
    };
@@ -62,8 +58,7 @@ namespace argz
 
    namespace detail
    {
-      inline std::string_view parse_var(const char* c)
-      {
+      inline std::string_view parse_var(const char* c) {
          auto start = c;
          while (*c != '\0' && *c != '-') {
             ++c;
@@ -78,7 +73,7 @@ namespace argz
          std::visit([&](auto&& x) {
             using X = std::decay_t<decltype(x)>;
             using T = typename X::type;
-            if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>) {
+            if constexpr (std::is_convertible_v<T, std::string_view>) {
                x.get() = str;
             }
             else if constexpr (std::is_arithmetic_v<T> && !std::is_same_v<T, bool>) {
@@ -97,12 +92,7 @@ namespace argz
 #endif
             }
             else if constexpr (std::is_same_v<T, bool>) {
-               if (str == "true") {
-                  x.get() = true;
-               }
-               else {
-                  x.get() = false;
-               }
+               x.get() = str == "true" ? true : false;
             }
             else {
                static_assert(false_v<X>, "Invalid parse type");
@@ -229,8 +219,9 @@ namespace argz
             str = detail::parse_var(flag);
          }
          else {
-            if (auto it = aliases.find(*flag); it != aliases.end()) {
-               str = it->second;
+            str = detail::parse_var(flag);
+            if (str.size() == 1 && aliases.contains(*flag)) {
+               str = aliases.at(*flag);
             }
             else {
                throw std::runtime_error("Invalid alias flag '-' for: " + std::string(str));
