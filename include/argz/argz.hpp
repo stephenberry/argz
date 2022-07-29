@@ -16,7 +16,6 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
-#include <unordered_map>
 #include <unordered_set>
 #include <variant>
 #include <vector>
@@ -119,34 +118,28 @@ namespace argz
 
    // we use a template to handle both "const char*" and "char*"
    template <class int_t, class char_ptr_t, std::enable_if_t<std::is_pointer_v<char_ptr_t>, int> = 0>
-   inline void parse(about& about, const options& opts, const int_t argc, char_ptr_t argv)
+   inline void parse(about& about, options& opts, const int_t argc, char_ptr_t argv)
    {
-      std::unordered_map<std::string_view, var> values;
-
       if (argc == 1) {
          detail::help(about, opts);
          return;
       }
 
       std::unordered_set<std::string_view> required_inputs, inputs;
-
-      std::unordered_map<char, std::string_view> aliases;
-
-      aliases['h'] = "help";
-      values.emplace("help", about.help);
+      
+      auto get_id = [&](char alias) -> std::string_view {
+         for (auto& x : opts) {
+            if (x.ids.alias == alias) {
+               return x.ids.id;
+            }
+         }
+         return {};
+      };
 
       for (auto& [ids, value, help, req] : opts)
       {
          if (ids.id.empty() && ids.alias == '\0') {
             throw std::runtime_error("Empty identifier given");
-         }
-         
-         if (ids.alias != '\0') {
-            aliases.emplace(ids.alias, ids.id);
-         }
-
-         if (ids.id.size()) {
-            values.emplace(ids.id, value);
          }
 
          if (req) {
@@ -168,30 +161,36 @@ namespace argz
          }
          else {
             str = detail::parse_var(flag);
-            if (str.size() == 1 && aliases.contains(*flag)) {
-               str = aliases.at(*flag);
+            if (str == "h" || str == "help") {
+               detail::help(about, opts);
+               continue;
             }
-            else {
-               throw std::runtime_error("Invalid alias flag '-' for: " + std::string(str));
+            else if (str.size() == 1) {
+               str = get_id(*flag);
+               
+               if (str.empty()) {
+                  throw std::runtime_error("Invalid alias flag '-' for: " + std::string(str));
+               }
             }
          }
          if (str.empty()) {
             break;
          }
          inputs.emplace(str);
-              
-         auto& v = values.at(str);
-         if (std::holds_alternative<ref<bool>>(v)) {
-            std::get<ref<bool>>(v).get() = true;
-         }
-         else {
-            detail::parse(argv[++i], v);
+         
+         for (auto& x : opts) {
+            if (x.ids.id == str) {
+               auto& v = x.value;
+               if (std::holds_alternative<ref<bool>>(v)) {
+                  std::get<ref<bool>>(v).get() = true;
+               }
+               else {
+                  detail::parse(argv[++i], v);
+               }
+            }
          }
       }
 
-      if (inputs.count("help")) {
-         detail::help(about, opts);
-      }
       if (inputs.count("version")) {
          std::cout << "Version: " << about.version << '\n';
       }
