@@ -125,13 +125,13 @@ namespace argz
          return {};
       };
 
-      for (auto& [ids, value, help, req] : opts)
+      for (auto& [ids, v, h, r] : opts)
       {
          if (ids.id.empty() && ids.alias == '\0') {
             throw std::runtime_error("Empty identifier given");
          }
 
-         if (req) {
+         if (r) {
             req_inputs.emplace(ids.id);
          }
       }
@@ -146,36 +146,33 @@ namespace argz
          std::string_view str;
          if (*flag == '-') {
             ++flag;
-            str = detail::parse_var(flag);
          }
-         else {
-            str = detail::parse_var(flag);
-            if (str == "h" || str == "help") {
-               detail::help(about, opts);
-               continue;
-            }
-            if (str == "v" || str == "version") {
-               std::cout << "Version: " << about.version << '\n';
-               continue;
-            }
-            if (str.size() == 1) {
-               str = get_id(*flag);
-               
-               if (str.empty()) {
-                  throw std::runtime_error("Invalid alias flag '-' for: " + std::string(str));
-               }
+         str = detail::parse_var(flag);
+         if (str == "h" || str == "help") {
+            detail::help(about, opts);
+            continue;
+         }
+         if (str == "v" || str == "version") {
+            std::cout << "Version: " << about.version << '\n';
+            continue;
+         }
+         if (str.size() == 1) {
+            str = get_id(*flag);
+            
+            if (str.empty()) {
+               throw std::runtime_error("Invalid alias flag '-' for: " + std::string(str));
             }
          }
          if (str.empty()) { break; }
          inputs.emplace(str);
          
-         for (auto& x : opts) {
-            if (x.ids.id == str) {
-               if (std::holds_alternative<ref<bool>>(x.value)) {
-                  std::get<ref<bool>>(x.value).get() = true;
+         for (auto& [ids, v, h, r] : opts) {
+            if (ids.id == str) {
+               if (std::holds_alternative<ref<bool>>(v)) {
+                  std::get<ref<bool>>(v).get() = true;
                }
                else {
-                  detail::parse(argv[++i], x.value);
+                  detail::parse(argv[++i], v);
                }
             }
          }
