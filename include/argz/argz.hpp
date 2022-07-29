@@ -24,11 +24,11 @@
 namespace argz
 {
    template <class T>
-   using ref_t = std::reference_wrapper<T>;
+   using ref = std::reference_wrapper<T>;
 
-   using var_t = std::variant<ref_t<bool>,
-      ref_t<int32_t>, ref_t<uint32_t>, ref_t<int64_t>, ref_t<uint64_t>,
-   ref_t<std::string>>;
+   using var = std::variant<ref<bool>,
+      ref<int32_t>, ref<uint32_t>, ref<int64_t>, ref<uint64_t>,
+   ref<std::string>>;
 
    struct ids_t final {
       std::string_view id{};
@@ -37,7 +37,7 @@ namespace argz
 
    struct arg_t final {
       ids_t ids{};
-      var_t value;
+      var value;
       std::string_view help{};
       bool required{};
    };
@@ -56,7 +56,10 @@ namespace argz
 
    namespace detail
    {
-      inline std::string_view parse_var(const char* c) {
+      template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+      template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+      
+      inline std::string parse_var(const char* c) {
          auto start = c;
          while (*c != '\0' && *c != ' ') {
             ++c;
@@ -64,37 +67,21 @@ namespace argz
          return { start, static_cast<size_t>(c - start) };
       }
 
-      inline void parse(const char* c, var_t& v)
+      inline void parse(const char* c, var& v)
       {
          const auto str = parse_var(c);
-
-         std::visit([&](auto&& x) {
-            using T = typename std::decay_t<decltype(x)>::type;
-            if constexpr (std::is_convertible_v<T, std::string_view>) {
-               x.get() = str;
-            }
-            else if constexpr (std::is_integral_v<T> && !std::is_same_v<T, bool>) {
-               x.get() = static_cast<T>(std::stol(std::string(str)));
-            }
-            else if constexpr (std::is_same_v<T, bool>) {
-               x.get() = str == "true" ? true : false;
-            }
-            else {
-               static_assert(false_v<T>, "Invalid parse type");
-            }
-            }, v);
+         std::visit(overloaded {
+            [&](ref<std::string>& x) { x.get() = str; },
+            [&](ref<bool>& x) { x.get() = str == "true" ? true : false; },
+            [&](auto& x) { x.get() = static_cast<typename std::decay_t<decltype(x)>::type>(std::stol(str)); },
+         }, v);
       }
 
-      inline std::string to_string(const var_t& v) {
-         return std::visit([](auto&& x) -> std::string {
-            using T = typename std::decay_t<decltype(x)>::type;
-            if constexpr (std::is_same_v<T, std::string>) {
-               return x;
-            }
-            else {
-               return std::to_string(x);
-            }
-            }, v);
+      inline std::string to_string(const var& v) {
+         return std::visit(overloaded {
+            [&](const ref<std::string>& x) { return x.get(); },
+            [&](const auto& x) { return std::to_string(x.get()); },
+         }, v);
       }
    }
 
@@ -142,7 +129,7 @@ namespace argz
    template <class int_t, class char_ptr_t, std::enable_if_t<std::is_pointer_v<char_ptr_t>, int> = 0>
    inline void parse(about& about, const options& opts, const int_t argc, char_ptr_t argv)
    {
-      std::unordered_map<std::string_view, var_t> values;
+      std::unordered_map<std::string_view, var> values;
 
       if (argc == 1) {
          detail::help(about, opts);
@@ -203,8 +190,8 @@ namespace argz
          inputs.emplace(str);
               
          auto& v = values.at(str);
-         if (std::holds_alternative<ref_t<bool>>(v)) {
-            std::get<ref_t<bool>>(v).get() = true;
+         if (std::holds_alternative<ref<bool>>(v)) {
+            std::get<ref<bool>>(v).get() = true;
          }
          else {
             detail::parse(argv[++i], v);
