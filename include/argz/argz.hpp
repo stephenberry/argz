@@ -102,13 +102,9 @@ namespace argz
 
       inline std::string to_string(const var_t& v) {
          return std::visit([](auto&& x) -> std::string {
-            using X = std::decay_t<decltype(x)>;
-            using T = typename X::type;
+            using T = typename std::decay_t<decltype(x)>::type;
             if constexpr (std::is_same_v<T, std::string>) {
                return x;
-            }
-            else if constexpr (std::is_same_v<T, std::string_view>) {
-               return std::string{ x };
             }
             else {
                return std::to_string(x);
@@ -181,9 +177,7 @@ namespace argz
 
       std::unordered_map<char, std::string_view> aliases;
 
-      if (!aliases.count('h')) {
-         aliases.emplace('h', "help");
-      }
+      aliases['h'] = "help";
       values.emplace("help", about.help);
 
       for (auto& [ids, value, help, req] : opts)
