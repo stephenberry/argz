@@ -50,13 +50,10 @@ namespace argz
       bool help{};
    };
 
-   template <class T>
-   inline constexpr bool false_v = false;
-
    namespace detail
    {
-      template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-      template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+      template <class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+      template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
       
       inline std::string parse_var(const char* c) {
          auto start = c;
@@ -103,21 +100,18 @@ namespace argz
                std::cout << (ids.id.size() == 1 ? "-" : "--") << ids.id;
             }
             
-            std::cout << (req ? " (required)  " : "    ");
-            std::cout << help;
+            std::cout << (req ? " (required)  " : "    ") << help;
             std::cout << ", default: " << detail::to_string(value) << '\n';
          }
          std::cout << '\n';
       }
    }
 
-   // we use a template to handle both "const char*" and "char*"
    template <class int_t, class char_ptr_t, std::enable_if_t<std::is_pointer_v<char_ptr_t>, int> = 0>
    inline void parse(about& about, options& opts, const int_t argc, char_ptr_t argv)
    {
       if (argc == 1) {
-         detail::help(about, opts);
-         return;
+         return detail::help(about, opts);
       }
 
       std::unordered_set<std::string_view> required_inputs, inputs;
