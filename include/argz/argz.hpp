@@ -119,13 +119,6 @@ namespace argz
          return {};
       };
 
-      for (auto& [ids, v, h] : opts)
-      {
-         if (ids.id.empty() && ids.alias == '\0') {
-            throw std::runtime_error("Empty identifier given");
-         }
-      }
-
       for (int_t i = 1; i < argc; ++i) {
          const char* flag = argv[i];
          if (*flag != '-') {
