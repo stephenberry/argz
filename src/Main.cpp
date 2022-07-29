@@ -84,13 +84,13 @@ int main(int argc, char* argv[])
 
    std::string input{};
    std::string study{};
-   double number = 1.23;
+   int number = 123;
    bool boolean = true;
 
    argz::options opts{
       { { "input", 'i' }, input, "the input file", argz::required},
       { { "study", 's' }, study, "a study file"},
-      { { "number" }, number, "input a double"},
+      { { "number" }, number, "input an int"},
       { { "boolean" }, boolean, "a boolean" }    
    };
 
@@ -122,20 +122,20 @@ int main(int argc, char* argv[])
    };
 
    test("test0") = [&] {
-      parse_string(R"(program.exe -i some_file --study study_file --boolean --number 1.2345)");
+      parse_string(R"(program.exe -i some_file --study study_file --boolean --number 12345)");
 
       expect(eq(input, std::string("some_file")));
       expect(eq(study, std::string("study_file")));
-      expect(eq(number, 1.2345));
+      expect(eq(number, 12345));
       expect(eq(boolean, true));
    };
 
    test("test1") = [&] {
-      parse_string(R"(program.exe -i some/path --study s --boolean --number 1.2)");
+      parse_string(R"(program.exe -i some/path --study s --boolean --number 12)");
 
       expect(eq(input, std::string("some/path")));
       expect(eq(study, std::string("s")));
-      expect(eq(number, 1.2));
+      expect(eq(number, 12));
       expect(eq(boolean, true));
    };
 
@@ -144,10 +144,10 @@ int main(int argc, char* argv[])
    };
 
    test("test3") = [&] {
-       parse_string(R"(program.exe -i "some/path" --study "s" --boolean --number 2.2 )");
+       parse_string(R"(program.exe -i "some/path" --study "s" --boolean --number 22 )");
        expect(eq(input, std::string("some/path")));
        expect(eq(study, std::string("s")));
-       expect(eq(number, 2.2));
+       expect(eq(number, 22));
        expect(eq(boolean, true));
    };
 
@@ -155,17 +155,15 @@ int main(int argc, char* argv[])
        parse_string(R"(program.exe -i                                 some/path --study s --boolean -- )");
        expect(eq(input, std::string("some/path")));
        expect(eq(study, std::string("s")));
-       expect(eq(number, 2.2));
+       expect(eq(number, 22));
        expect(eq(boolean, true)); 
    };
 
    test("test5") = [&] {
        expect(nothrow([&] {parse_string(R"(program.exe -h)"); }));
-
    };
 
    test("test6") = [&] {
-     
        expect(nothrow([&] {parse_string(R"(program.exe -i some/path --study s --boolean   --        )"); }));
        expect(eq(input, std::string("some/path")));
        expect(eq(study, std::string("s")));
@@ -174,8 +172,7 @@ int main(int argc, char* argv[])
    };
 
    test("test7") = [&] {
-       
-       expect(throws([&] {parse_string(R"(program.exe -i some/path --study s --boolean  2.7 --number true)"); }));
+       expect(throws([&] {parse_string(R"(program.exe -i some/path --study s --boolean  27 --number true)"); }));
    };
    
    test("test-dashes") = [&] {

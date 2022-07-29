@@ -27,7 +27,7 @@ To add a new argument, simply create ```argz::options```. Provide a list of argu
 ```cpp
 std::string input{};
 std::string study{};
-double number = 1.23;
+int number = 123;
 bool boolean = true;
 argz::options opts{
    { { "input", 'i' }, input, "the input file", argz::required},
@@ -50,7 +50,7 @@ catch (const std::exception& e) {
 
 **That is all!**
 
-> Note that we don't have to cast out (.e.g. `.as<double>`) from our argument parser because it reads directly into the variables passed in as options!
+> Note that we don't have to cast out (.e.g. `.as<int>`) from our argument parser because it reads directly into the variables passed in as options!
 
 ### Printing Help
 
@@ -64,6 +64,6 @@ Version: 1.2.3
 -v, --version           write the version to console
 -i, --input (required)  the input file
 -s, --study             a study file
---number                input a double, default: 1.230000
+--number                input an int, default: 123
 --boolean               a boolean, default: 1
 ```

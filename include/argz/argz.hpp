@@ -28,9 +28,8 @@ namespace argz
    using ref_t = std::reference_wrapper<T>;
 
    using var_t = std::variant<ref_t<bool>,
-      ref_t<int>, ref_t<std::size_t>,
-      ref_t<float>, ref_t<double>,
-      ref_t<std::string>>;
+      ref_t<int32_t>, ref_t<uint32_t>, ref_t<int64_t>, ref_t<uint64_t>,
+   ref_t<std::string>>;
 
    struct ids_t final {
       std::string_view id{};
@@ -71,31 +70,25 @@ namespace argz
          const auto str = parse_var(c);
 
          std::visit([&](auto&& x) {
-            using X = std::decay_t<decltype(x)>;
-            using T = typename X::type;
+            using T = typename std::decay_t<decltype(x)>::type;
             if constexpr (std::is_convertible_v<T, std::string_view>) {
                x.get() = str;
             }
-            else if constexpr (std::is_arithmetic_v<T> && !std::is_same_v<T, bool>) {
+            else if constexpr (std::is_integral_v<T> && !std::is_same_v<T, bool>) {
 #ifdef __cpp_lib_to_chars
                auto [p, ec] = std::from_chars(str.data(), str.data() + str.size(), x);
                if (ec != std::errc()) {
                   throw std::runtime_error("Invalid number parse for: " + std::string(str));
                }
 #else
-               if constexpr (std::is_integral_v<T>) {
-                  x.get() = static_cast<T>(std::stol(std::string(str)));
-               }
-               else {
-                  x.get() = static_cast<T>(std::stod(std::string(str)));
-               }
+               x.get() = static_cast<T>(std::stol(std::string(str)));
 #endif
             }
             else if constexpr (std::is_same_v<T, bool>) {
                x.get() = str == "true" ? true : false;
             }
             else {
-               static_assert(false_v<X>, "Invalid parse type");
+               static_assert(false_v<T>, "Invalid parse type");
             }
             }, v);
       }
@@ -185,7 +178,7 @@ namespace argz
          if (ids.id.empty() && ids.alias == '\0') {
             throw std::runtime_error("Empty identifier given");
          }
-
+         
          if (ids.alias != '\0') {
             aliases.emplace(ids.alias, ids.id);
          }
