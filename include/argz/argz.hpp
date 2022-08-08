@@ -59,12 +59,14 @@ namespace argz
 
       inline void parse(const char* c, var& v)
       {
-         const auto str = parse_var(c);
-         std::visit(overloaded {
-            [&](ref<std::string>& x) { x.get() = str; },
-            [&](ref<bool>& x) { x.get() = str == "true" ? true : false; },
-            [&](auto& x) { x.get() = static_cast<typename std::decay_t<decltype(x)>::type>(std::stol(str)); },
-         }, v);
+         if (c) {
+            const auto str = parse_var(c);
+            std::visit(overloaded{
+               [&](ref<std::string>& x) { x.get() = str; },
+               [&](ref<bool>& x) { x.get() = str == "true" ? true : false; },
+               [&](auto& x) { x.get() = static_cast<typename std::decay_t<decltype(x)>::type>(std::stol(str)); },
+               }, v);
+         }
       }
 
       inline std::string to_string(const var& v) {
