@@ -49,7 +49,7 @@ namespace argz
       template <class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
       template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
       
-      inline std::string parse_var(const char* c) {
+      inline std::string_view parse_var(const char* c) {
          auto start = c;
          while (*c != '\0' && *c != ' ') {
             ++c;
@@ -64,7 +64,7 @@ namespace argz
             std::visit(overloaded{
                [&](ref<std::string>& x) { x.get() = str; },
                [&](ref<bool>& x) { x.get() = str == "true" ? true : false; },
-               [&](auto& x) { x.get() = static_cast<typename std::decay_t<decltype(x)>::type>(std::stol(str)); },
+               [&](auto& x) { x.get() = static_cast<typename std::decay_t<decltype(x)>::type>(std::stol(std::string(str))); },
                }, v);
          }
       }
