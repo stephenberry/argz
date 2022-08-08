@@ -183,6 +183,11 @@ int main(int argc, char* argv[])
        parse_string(R"(program.exe -i ./some-path-with-dashes.txt )");
        expect(eq(input, std::string("./some-path-with-dashes.txt"))) << "actual: " << input;
    };
+   
+   test("quoted_path") = [&] {
+       parse_string(R"(program.exe -i "./../some path with dashes.txt" )");
+       expect(eq(input, std::string("./../some path with dashes.txt"))) << "actual: " << input;
+   };
 
    return 0;
 }
