@@ -62,7 +62,7 @@ Version: 1.2.3
 
 -h, --help              write help to console
 -v, --version           write the version to console
--i, --input						  the input file
+-i, --input             the input file
 -s, --study             a study file
 --number                input an int, default: 123
 --boolean               a boolean, default: 1
