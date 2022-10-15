@@ -5,6 +5,7 @@ A light weight C++ in memory argument parser.
 
 * Single header file
 * Requires C++17
+* Less than 200 lines of code
 * Apache 2.0 License
 
 ## Quick Start
