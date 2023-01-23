@@ -52,12 +52,12 @@ namespace argz
       
       inline std::string_view parse_var(const char* c) {
          auto start = c;
-         while (*c != '\0' && *c != ' ') {
+         while (*c != '\0') {
             ++c;
          }
          return { start, static_cast<size_t>(c - start) };
       }
-
+      
       inline void parse(const char* c, var& v)
       {
          if (c) {
@@ -118,7 +118,7 @@ namespace argz
       for (int_t i = 1; i < argc; ++i) {
          const char* flag = argv[i];
          if (*flag != '-') {
-            throw std::runtime_error("expected '-'");
+            throw std::runtime_error("Expected '-'");
          }
          ++flag;
          

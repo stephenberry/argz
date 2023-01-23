@@ -25,7 +25,7 @@ inline std::vector<std::string> string_to_vector(const std::string& str)
          if (*c == '-') {
             ++c;
             if (*c == '-') {
-               throw std::runtime_error("unepected '-'");
+               throw std::runtime_error("Unepected -");
             }
             else if (*c==' ') {
                 break;
@@ -45,19 +45,24 @@ inline std::vector<std::string> string_to_vector(const std::string& str)
             ret.emplace_back(std::string(std::string_view{ start, static_cast<size_t>(c - start) }));
          }
       }
-      else if (*c == ' ' || *c == '"') {
-         while (*c == ' ' || *c == '"') {
-            ++c;
-         }
+      else if (*c == '"') {
+         ++c;
          auto start = c;
-         while (*c != '\0' && *c != ' ' && *c != '"') {
+         while (*c != '\0' && *c != '"') {
             ++c;
          }
-         if (c != start) {
-
-            ret.emplace_back(std::string(std::string_view{ start, static_cast<size_t>(c - start) }));
+         if (*c == '\0') {
+            throw std::runtime_error("Expected \"");
          }
-      }       
+         
+         ret.emplace_back(std::string(std::string_view{ start, static_cast<size_t>(c - start) }));
+         ++c; // skip last quote
+      }
+      else if (*c == ' ') {
+         while (*c == ' ') {
+            ++c;
+         }
+      }
       else {
          auto start = c;
          while (*c != ' ' && *c != '\0') {
@@ -184,10 +189,10 @@ int main(int argc, char* argv[])
        expect(input == std::string("./some-path-with-dashes.txt")) << "actual: " << input;
    };
    
-   /*test("quoted_path") = [&] {
+   test("quoted_path") = [&] {
        parse_string(R"(program.exe -i "./../some quoted path.txt" )");
        expect(input == "./../some quoted path.txt") << "actual: " << input;
-   };*/
+   };
 
    return 0;
 }
