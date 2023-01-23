@@ -1,57 +1,42 @@
-cmake_minimum_required(VERSION 3.0)
-project(argz)
+cmake_minimum_required(VERSION 3.18)
 
-# This flag allows visual studio projects to be organized into folders in the solution explorer.
-#    It also forces CMAKE default targets (eg ALL_BUILD, INSTALL, ZERO_CHECK, etc) to be placed in a folder
-#    of the solution called "CMakePredefinedTargets".
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+include(cmake/prelude.cmake)
 
-if(MSVC)
-	add_definitions(/bigobj)
-	# C++ exceptions
-	add_definitions(/EHsc)
-endif()
+project(
+    argz
+    VERSION 0.1.0
+    LANGUAGES CXX
+)
 
-file(GLOB_RECURSE srcs include/argz/*.hpp)
+include(cmake/project-is-top-level.cmake)
+include(cmake/variables.cmake)
 
-# Organize files into directories
-foreach(FILE ${srcs})
-   # Get the directory of the source file
-   get_filename_component(PARENT_DIR "${FILE}" PATH)
+add_library(argz_argz INTERFACE)
+add_library(argz::argz ALIAS argz_argz)
 
-   # Remove common directory prefix to make the group
-   string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}" "" GROUP "${PARENT_DIR}")
-
-if(MSVC)
-   # Make sure we are using windows slashes
-   string(REPLACE "/" "\\" GROUP "${GROUP}")
-endif()
-
-   # Group into "Source Files" and "Header Files"
-   if ("${FILE}" MATCHES ".*\\.cpp")
-      set(GROUP "Source Files${GROUP}")
-   elseif("${FILE}" MATCHES ".*\\.h")
-      set(GROUP "Header Files${GROUP}")
+if (MSVC)
+   string(REGEX MATCH "\/cl(.exe)?$" matched_cl ${CMAKE_CXX_COMPILER})
+   if (matched_cl)
+      # for a C++ standards compliant preprocessor, not needed for clang-cl
+      target_compile_options(argz_argz INTERFACE "/Zc:preprocessor" /GL /permissive- /Zc:lambda)
+      target_link_options(argz_argz INTERFACE /LTCG /INCREMENTAL:NO)
    endif()
-
-   source_group("${GROUP}" FILES "${FILE}")
-endforeach()
-
-add_library(${PROJECT_NAME} INTERFACE)
-target_include_directories(${PROJECT_NAME} INTERFACE include)
-target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_17)
-
-set(CPM_LOCAL_PACKAGE_PATHS "" CACHE FILEPATH "Path to CMake file (.cmake) setting CPM_dep_SOURCE variables")
-
-if(NOT ${CPM_LOCAL_PACKAGE_PATHS} STREQUAL "")
-   include(${CPM_LOCAL_PACKAGE_PATHS})
+else()
+   target_compile_options(argz_argz INTERFACE "-Wno-missing-braces")
 endif()
 
-include(cmake/CPM.cmake)
+set_property(TARGET argz_argz PROPERTY EXPORT_NAME argz)
 
-if(${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
-   # This flag allows visual studio projects to be organized into folders 
-	# in the solution explorer.
-	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-	add_subdirectory(src)
+target_compile_features(argz_argz INTERFACE cxx_std_17)
+target_include_directories(
+    argz_argz ${warning_guard}
+    INTERFACE "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
+)
+
+if(NOT CMAKE_SKIP_INSTALL_RULES)
+  include(cmake/install-rules.cmake)
+endif()
+
+if (PROJECT_IS_TOP_LEVEL)
+  include(cmake/dev-mode.cmake)
 endif()
