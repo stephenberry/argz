@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <functional>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -29,7 +30,7 @@ namespace argz
    struct ids_t final {
       std::string_view id{};
       char alias = '\0';
-   };   
+   };
 
    struct arg_t final {
       ids_t ids{};
