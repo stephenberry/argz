@@ -26,4 +26,4 @@ add_executable(argz_test ${sources} ${headers})
 
 target_link_libraries(argz_test PRIVATE argz::argz ut)
 
-set_target_properties(argz_argz argz_test PROPERTIES FOLDER ProjectTargets)
+add_test(NAME argz_test COMMAND argz_test)
