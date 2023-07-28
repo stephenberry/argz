@@ -194,5 +194,11 @@ int main(int argc, char* argv[])
        expect(input == "./../some quoted path.txt") << "actual: " << input;
    };
 
+   test("no_options_is_possible") = [&] {
+       parse_string(R"(program.exe)");
+
+       expect(nothrow([&] {argz::parse_when_no_options_is_possible(about, opts, buffers.size(), buffers.data()); }));
+   };
+
    return 0;
 }
