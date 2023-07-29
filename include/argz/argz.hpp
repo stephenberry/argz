@@ -15,6 +15,7 @@
 #include <cstdint>
 #include <functional>
 #include <iostream>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -26,7 +27,21 @@ namespace argz
    template <class T>
    using ref = std::reference_wrapper<T>;
 
-   using var = std::variant<ref<bool>, ref<int32_t>, ref<uint32_t>, ref<int64_t>, ref<uint64_t>, ref<std::string>>;
+   template <class T>
+   using ref_opt = ref<std::optional<T>>;
+
+   using var = std::variant<
+      ref<bool>,
+      ref<int32_t>,
+      ref<uint32_t>,
+      ref<int64_t>,
+      ref<uint64_t>,
+      ref<std::string>,
+      ref_opt<int32_t>,
+      ref_opt<uint32_t>,
+      ref_opt<int64_t>,
+      ref_opt<uint64_t>,
+      ref_opt<std::string>>;
    
    struct ids_t final {
       std::string_view id{};
@@ -59,14 +74,20 @@ namespace argz
          return { start, static_cast<size_t>(c - start) };
       }
       
-      inline void parse(const char* c, var& v)
+      inline void parse(const char* const c, var& v)
       {
          if (c) {
             const auto str = parse_var(c);
             std::visit(overloaded{
                [&](ref<std::string>& x) { x.get() = str; },
                [&](ref<bool>& x) { x.get() = str == "true" ? true : false; },
-               [&](auto& x) { x.get() = static_cast<typename std::decay_t<decltype(x)>::type>(std::stol(std::string(str))); },
+               [&]<typename T>(ref_opt<T>& x_opt) {
+                  auto temp = T { };
+                  auto temp_var = var{ ref { temp } };
+                  parse(c, temp_var);
+                  x_opt.get().emplace(std::get<ref<T>>(temp_var).get());
+               },
+               [&](auto& x) { x.get() = static_cast<typename std::decay_t<decltype(x)>::type>(std::stol(std::string(str))); }
                }, v);
          }
       }
@@ -74,6 +95,16 @@ namespace argz
       inline std::string to_string(const var& v) {
          return std::visit(overloaded {
             [](const ref<std::string>& x) { return x.get(); },
+            [](const ref_opt<std::string>& x) {
+               const auto has_value = x.get().has_value();
+               if (has_value) return x.get().value();
+               else return std::string{ };
+            },
+            []<typename T>(const ref_opt<T>& x_opt) {
+               const auto has_value = x_opt.get().has_value();
+               if (has_value) return std::to_string(x_opt.get().value());
+               else return std::string{ };
+            },
             [](const auto& x) { return std::to_string(x.get()); },
          }, v);
       }
