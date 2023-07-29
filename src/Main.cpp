@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
    std::string input{};
    std::string study{};
    int number = 123;
-   bool boolean = true;
+   bool boolean = false;
 
    argz::options opts{
       { { "input", 'i' }, input, "the input file"},
@@ -127,15 +127,19 @@ int main(int argc, char* argv[])
    };
 
    test("test0") = [&] {
+	  boolean = false; // Reset not to be right on default
       parse_string(R"(program.exe -i some_file --study study_file --boolean --number 12345)");
 
       expect(input == "some_file");
       expect(study == "study_file");
       expect(number == 12345);
       expect(boolean == true);
+
+
    };
 
    test("test1") = [&] {
+	  boolean = false; // Reset not to be right on default
       parse_string(R"(program.exe -i some/path --study s --boolean --number 12)");
 
       expect(input == "some/path");
@@ -149,6 +153,7 @@ int main(int argc, char* argv[])
    };
 
    test("test3") = [&] {
+	   boolean = false; // Reset not to be right on default
        parse_string(R"(program.exe -i "some/path" --study "s" --boolean --number 22 )");
        expect(input == "some/path");
        expect(study == "s");
@@ -157,6 +162,7 @@ int main(int argc, char* argv[])
    };
 
    test("test4") = [&] {
+	   boolean = false; // Reset not to be right on default
        parse_string(R"(program.exe -i                                 some/path --study s --boolean -- )");
        expect(input == "some/path");
        expect(study == "s");
@@ -169,6 +175,7 @@ int main(int argc, char* argv[])
    };
 
    test("test6") = [&] {
+	   boolean = false; // Reset not to be right on default
        expect(nothrow([&] {parse_string(R"(program.exe -i some/path --study s --boolean   --        )"); }));
        expect(input == "some/path");
        expect(study == "s");
@@ -177,6 +184,7 @@ int main(int argc, char* argv[])
    };
 
    test("test7") = [&] {
+	   boolean = false; // Reset not to be right on default
        expect(throws([&] {parse_string(R"(program.exe -i some/path --study s --boolean  27 --number true)"); }));
    };
    
