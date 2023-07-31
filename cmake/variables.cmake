@@ -1,11 +1,11 @@
 # ---- Developer mode ----
 
 # Developer mode enables targets and code paths in the CMake scripts that are
-# only relevant for the developer(s) of glaze
+# only relevant for the developer(s) of argz
 # Targets necessary to build the project must be provided unconditionally, so
 # consumers can trivially build and package the project
 if(PROJECT_IS_TOP_LEVEL)
-  option(glaze_DEVELOPER_MODE "Enable developer mode" OFF)
+  option(argz_DEVELOPER_MODE "Enable developer mode" OFF)
 endif()
 
 # ---- Warning guard ----
@@ -17,12 +17,12 @@ endif()
 set(warning_guard "")
 if(NOT PROJECT_IS_TOP_LEVEL)
   option(
-      glaze_INCLUDES_WITH_SYSTEM
-      "Use SYSTEM modifier for glaze's includes, disabling warnings"
+      argz_INCLUDES_WITH_SYSTEM
+      "Use SYSTEM modifier for argz's includes, disabling warnings"
       ON
   )
-  mark_as_advanced(glaze_INCLUDES_WITH_SYSTEM)
-  if(glaze_INCLUDES_WITH_SYSTEM)
+  mark_as_advanced(argz_INCLUDES_WITH_SYSTEM)
+  if(argz_INCLUDES_WITH_SYSTEM)
     set(warning_guard SYSTEM)
   endif()
 endif()
