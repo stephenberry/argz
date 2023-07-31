@@ -209,6 +209,13 @@ int main(int argc, char* argv[])
        expect(input == "./../some quoted path.txt") << "actual: " << input;
    };
 
+   test("no_options_is_possible") = [&] {
+      parse_string(R"(program.exe)");
+      about.print_help_when_no_options = false;
+      
+      expect(nothrow([&] {argz::parse(about, opts, buffers.size(), buffers.data()); }));
+   };
+      
    test("opt_test0") = [&] {
       boolean = false; // Reset not to be right on default
       input_opt = {};

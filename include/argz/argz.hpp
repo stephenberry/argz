@@ -58,6 +58,7 @@ namespace argz
 
    struct about final {
       std::string_view description{}, version{};
+      bool print_help_when_no_options = true;
       bool help{};
    };
 
@@ -135,7 +136,10 @@ namespace argz
    inline void parse(about& about, options& opts, const int_t argc, char_ptr_t argv)
    {
       if (argc == 1) {
-         return help(about, opts);
+         if (about.print_help_when_no_options) {
+            help(about, opts);
+         }
+         return;
       }
       
       auto get_id = [&](char alias) -> std::string_view {
