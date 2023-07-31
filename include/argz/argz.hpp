@@ -58,6 +58,7 @@ namespace argz
 
    struct about final {
       std::string_view description{}, version{};
+      bool print_help_when_no_options = true;
       bool help{};
    };
 
@@ -131,11 +132,11 @@ namespace argz
       std::cout << '\n';
    }
 
-   template <class int_t, class char_ptr_t, bool print_help_when_no_options = true, std::enable_if_t<std::is_pointer_v<char_ptr_t>, int> = 0>
+   template <class int_t, class char_ptr_t, std::enable_if_t<std::is_pointer_v<char_ptr_t>, int> = 0>
    inline void parse(about& about, options& opts, const int_t argc, char_ptr_t argv)
    {
       if (argc == 1) {
-         if constexpr (print_help_when_no_options) {
+         if (about.print_help_when_no_options) {
             help(about, opts);
          }
          return;
@@ -189,14 +190,5 @@ namespace argz
             }
          }
       }
-   }
-
-   /**
-   * Overload for enabling no options to be valid
-   */
-   template <class int_t, class char_ptr_t, std::enable_if_t<std::is_pointer_v<char_ptr_t>, int> = 0>
-   inline void parse_when_no_options_is_possible(about& about, options& opts, const int_t argc, char_ptr_t argv)
-   {
-      parse<int_t, char_ptr_t, false>(about, opts, argc, argv);
    }
 }

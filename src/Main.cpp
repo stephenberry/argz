@@ -211,8 +211,9 @@ int main(int argc, char* argv[])
 
    test("no_options_is_possible") = [&] {
       parse_string(R"(program.exe)");
+      about.print_help_when_no_options = false;
       
-      expect(nothrow([&] {argz::parse_when_no_options_is_possible(about, opts, buffers.size(), buffers.data()); }));
+      expect(nothrow([&] {argz::parse(about, opts, buffers.size(), buffers.data()); }));
    };
       
    test("opt_test0") = [&] {
