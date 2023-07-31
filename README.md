@@ -30,11 +30,13 @@ std::string input{};
 std::string study{};
 int number = 123;
 bool boolean = true;
+std::optional<int> number_opt{};
 argz::options opts{
    { { "input", 'i' }, input, "the input file"},
    { { "study", 's' }, study, "a study file"},
-   { { "number" }, number, "input a double"},
-   { { "boolean" }, boolean, "a boolean" }    
+   { { "number" }, number, "input an int"},
+   { { "boolean" }, boolean, "a boolean" },
+   { { "number_opt" }, number_opt, "input an int"}
 };
 ```
 
@@ -55,7 +57,7 @@ catch (const std::exception& e) {
 
 ### Printing Help
 
-`-h` prints a help message, including the program usage and information about the arguments registered with the `Argz Parser`. An example help message:
+`-h` prints a help message, including the program usage and information about the arguments registered with the Argz Parser. An example help message:
 
 ```
 My program description
@@ -68,3 +70,19 @@ Version: 1.2.3
 --number                input an int, default: 123
 --boolean               a boolean, default: 1
 ```
+
+### Supported Input Types
+
+`bool`, `int32_t`, `uint32_t`, `int64_t`, `uint64_t`, `std::string`
+
+And, `std::optional<T>`, where `T` is any of the above types except `bool`
+
+### Accept No Inputs Without Printing Help
+
+By default the help is printed when no inputs are given. If this behavior is not desirable, set `print_help_when_no_options` to false inside of `argz::about`.
+
+```c++
+argz::about about{ "My program description", version,
+                 .print_help_when_no_options = false };
+```
+
