@@ -82,8 +82,8 @@ namespace argz
                [&](ref<std::string>& x) { x.get() = str; },
                [&](ref<bool>& x) { x.get() = str == "true" ? true : false; },
                [&]<typename T>(ref_opt<T>& x_opt) {
-                  auto temp = T { };
-                  auto temp_var = var{ ref { temp } };
+                  auto temp = T{};
+                  auto temp_var = var{ ref<T>{ temp } };
                   parse(c, temp_var);
                   x_opt.get().emplace(std::get<ref<T>>(temp_var).get());
                },
