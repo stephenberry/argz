@@ -75,7 +75,7 @@ Version: 1.2.3
 
 `bool`, `int32_t`, `uint32_t`, `int64_t`, `uint64_t`, `std::string`
 
-And, `std::optional<T>`, where `T` is any of the above types except `bool`
+And `std::optional<T>`, where `T` is any of the above types except `bool`
 
 ### Accept No Inputs Without Printing Help
 
