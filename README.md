@@ -4,7 +4,7 @@ A light weight C++ in memory argument parser.
 ## Highlights
 
 * Single header file
-* Requires C++17
+* Requires C++20
 * Less than 200 lines of code
 * Apache 2.0 License
 
