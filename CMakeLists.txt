@@ -27,7 +27,7 @@ endif()
 
 set_property(TARGET argz_argz PROPERTY EXPORT_NAME argz)
 
-target_compile_features(argz_argz INTERFACE cxx_std_17)
+target_compile_features(argz_argz INTERFACE cxx_std_20)
 target_include_directories(
     argz_argz ${warning_guard}
     INTERFACE "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"

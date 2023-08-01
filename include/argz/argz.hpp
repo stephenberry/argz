@@ -132,7 +132,7 @@ namespace argz
       std::cout << '\n';
    }
 
-   template <class int_t, class char_ptr_t, std::enable_if_t<std::is_pointer_v<char_ptr_t>, int> = 0>
+   template <class int_t, class char_ptr_t> requires (std::is_pointer_v<char_ptr_t>)
    inline void parse(about& about, options& opts, const int_t argc, char_ptr_t argv)
    {
       if (argc == 1) {
