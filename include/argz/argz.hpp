@@ -67,18 +67,10 @@ namespace argz
       template <class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
       template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
       
-      inline std::string_view parse_var(const char* c) {
-         auto start = c;
-         while (*c != '\0') {
-            ++c;
-         }
-         return { start, static_cast<size_t>(c - start) };
-      }
-      
       inline void parse(const char* const c, var& v)
       {
          if (c) {
-            const auto str = parse_var(c);
+            const std::string_view str{ c };
             std::visit(overloaded{
                [&](ref<std::string>& x) { x.get() = str; },
                [&](ref<bool>& x) { x.get() = str == "true" ? true : false; },
@@ -158,11 +150,10 @@ namespace argz
          }
          ++flag;
          
-         std::string_view str;
          if (*flag == '-') {
             ++flag;
          }
-         str = detail::parse_var(flag);
+         std::string_view str{ flag };
          if (str == "h" || str == "help") {
             help(about, opts);
             continue;
