@@ -70,7 +70,7 @@ namespace argz
       inline void parse(const char* const c, var& v)
       {
          if (c) {
-            const auto str = std::string_view{ c };
+            const std::string_view str{ c };
             std::visit(overloaded{
                [&](ref<std::string>& x) { x.get() = str; },
                [&](ref<bool>& x) { x.get() = str == "true" ? true : false; },
@@ -153,7 +153,7 @@ namespace argz
          if (*flag == '-') {
             ++flag;
          }
-         auto str = std::string_view{ flag };
+         std::string_view str{ flag };
          if (str == "h" || str == "help") {
             help(about, opts);
             continue;
