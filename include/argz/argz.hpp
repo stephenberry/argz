@@ -119,7 +119,9 @@ namespace argz
          else {
             std::cout << (ids.id.size() == 1 ? "-" : "--") << ids.id;
          }
-         std::cout << "    " << h << ", default: " << detail::to_string(v) << '\n';
+         
+         std::cout << "    " << h;
+         detail::to_string(v).empty() ? std::cout << '\n' : std::cout << ", default: " << detail::to_string(v) << '\n';
       }
       std::cout << '\n';
    }
