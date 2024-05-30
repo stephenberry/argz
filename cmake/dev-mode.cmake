@@ -8,8 +8,8 @@ include(FetchContent)
 
 FetchContent_Declare(
    ut
-   GIT_REPOSITORY https://github.com/boost-ext/ut.git
-   GIT_TAG master
+   GIT_REPOSITORY https://github.com/openalgz/ut
+   GIT_TAG v0.0.3
    GIT_SHALLOW TRUE
 )
 
@@ -24,6 +24,6 @@ source_group(TREE "${PROJECT_SOURCE_DIR}/src" PREFIX sources FILES ${sources})
 
 add_executable(argz_test ${sources} ${headers})
 
-target_link_libraries(argz_test PRIVATE argz::argz ut)
+target_link_libraries(argz_test PRIVATE argz::argz ut::ut)
 
 add_test(NAME argz_test COMMAND argz_test)

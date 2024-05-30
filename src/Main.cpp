@@ -76,11 +76,10 @@ inline std::vector<std::string> string_to_vector(const std::string& str)
    return ret;
 }
 
-#define BOOST_UT_DISABLE_MODULE
-#include "boost/ut.hpp"
+#define UT_RUNTIME_ONLY
+#include "ut/ut.hpp"
 
-using namespace boost::ut;
-using namespace boost::ut::literals;
+using namespace ut;
 
 int main(int argc, char* argv[])
 {
@@ -178,12 +177,12 @@ int main(int argc, char* argv[])
    };
 
    test("test5") = [&] {
-       expect(nothrow([&] {parse_string(R"(program.exe -h)"); }));
+       expect(not throws([&] {parse_string(R"(program.exe -h)"); }));
    };
 
    test("test6") = [&] {
        boolean = false; // Reset not to be right on default
-       expect(nothrow([&] {parse_string(R"(program.exe -i some/path --study s --boolean   --        )"); }));
+       expect(not throws([&] {parse_string(R"(program.exe -i some/path --study s --boolean   --        )"); }));
        expect(input == "some/path");
        expect(study == "s");
        expect(boolean == true);
@@ -196,7 +195,7 @@ int main(int argc, char* argv[])
    };
    
    test("test8") = [&] {
-       expect(nothrow([&] {parse_string(R"(program.exe - )"); }));
+       expect(not throws([&] {parse_string(R"(program.exe - )"); }));
    };
    
    test("test-dashes") = [&] {
@@ -213,7 +212,7 @@ int main(int argc, char* argv[])
       parse_string(R"(program.exe)");
       about.print_help_when_no_options = false;
       
-      expect(nothrow([&] {argz::parse(about, opts, buffers.size(), buffers.data()); }));
+      expect(not throws([&] {argz::parse(about, opts, buffers.size(), buffers.data()); }));
    };
       
    test("opt_test0") = [&] {
@@ -277,7 +276,7 @@ int main(int argc, char* argv[])
    };
 
    test("opt_test5") = [&] {
-       expect(nothrow([&] {parse_string(R"(program.exe -h)"); }));
+       expect(not throws([&] {parse_string(R"(program.exe -h)"); }));
    };
 
    test("opt_test6") = [&] {
@@ -286,7 +285,7 @@ int main(int argc, char* argv[])
        study_opt = {};
        number_opt = {};
 
-       expect(nothrow([&] {parse_string(R"(program.exe --input_opt some/path --study_opt s --boolean   --        )"); }));
+       expect(not throws([&] {parse_string(R"(program.exe --input_opt some/path --study_opt s --boolean   --        )"); }));
 
        expect(input_opt.value() == "some/path");
        expect(study_opt.value() == "s");
@@ -305,7 +304,7 @@ int main(int argc, char* argv[])
        study_opt = {};
        number_opt = {};
 
-       expect(nothrow([&] {parse_string(R"(program.exe - )"); }));
+       expect(not throws([&] {parse_string(R"(program.exe - )"); }));
 
        expect(!input_opt.has_value());
        expect(!study_opt.has_value());

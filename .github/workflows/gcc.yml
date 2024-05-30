@@ -11,27 +11,32 @@ on:
     branches: [main]
     paths-ignore:
     - '**.md'
-
-env:
-  BUILD_TYPE: Release
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        gcc: [12, 13, 14]
+        build_type: [Debug]
+        std: [20, 23]
 
     env:
-      CC: gcc-11
-      CXX: g++-11
+      CC: gcc-${{matrix.gcc}}
+      CXX: g++-${{matrix.gcc}}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_STANDARD=${{matrix.std}}
 
     - name: Build
-      run: cmake --build build -j 2
+      run: cmake --build build -j $(nproc)
 
     - name: Test
       working-directory: build
-      run: ctest -j 2 --output-on-failure
+      run: ctest -j $(nproc) --output-on-failure
